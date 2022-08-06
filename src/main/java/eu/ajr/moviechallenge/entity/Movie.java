@@ -1,18 +1,24 @@
 package eu.ajr.moviechallenge.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
-@Getter
+/*@Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor*/
+@Data
 @Entity
 @Table(
         name = "movie",
@@ -20,20 +26,23 @@ import java.util.UUID;
                 @UniqueConstraint(columnNames = {"uuid"}, name = "movie_unique_uuid")
         }
 )
-public class Movie {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Movie implements Serializable {
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "UUID NOT NULL UNIQUE", updatable = false)
+    @Column(updatable = false, nullable = false, unique = true)
     private UUID uuid;
 
+    @NotNull
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "launch_date")
-    private Date launchDate;
+    @Column(name = "release_date")
+    private LocalDate releaseDate;
 
     @Column(name = "rank")
     private int rank;
