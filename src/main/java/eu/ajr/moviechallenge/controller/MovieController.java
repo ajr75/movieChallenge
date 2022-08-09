@@ -1,11 +1,14 @@
 package eu.ajr.moviechallenge.controller;
 
-import eu.ajr.moviechallenge.dto.MovieDTO;
+import eu.ajr.moviechallenge.dto.MovieDto;
 import eu.ajr.moviechallenge.entity.Movie;
 import eu.ajr.moviechallenge.service.MovieService;
 import eu.ajr.moviechallenge.util.ValidationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,8 +38,8 @@ public class MovieController {
     @Operation(summary = "Register new movie data in the movie database")
     @PostMapping
     @Transactional
-    public ResponseEntity<MovieDTO> create(@Valid @RequestBody MovieDTO movieDto) {
-        MovieDTO createdMovieDto = this.movieService.save(movieDto);
+    public ResponseEntity<MovieDto> create(@Valid @RequestBody MovieDto movieDto) {
+        MovieDto createdMovieDto = this.movieService.save(movieDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMovieDto);
     }
 
@@ -56,13 +59,13 @@ public class MovieController {
     @Operation(summary = "Update movie data")
     @PutMapping("/{uuid}")
     @Transactional
-    public ResponseEntity<MovieDTO> update(@PathVariable(value = "uuid") UUID uuid,
-                                        @Valid @RequestBody MovieDTO movieDto) {
+    public ResponseEntity<MovieDto> update(@PathVariable(value = "uuid") UUID uuid,
+                                        @Valid @RequestBody MovieDto movieDto) {
         if (!movieDto.getUuid().equals(uuid)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
-        MovieDTO movieUpdated;
+        MovieDto movieUpdated;
         try {
             movieUpdated = this.movieService.update(uuid, movieDto);
         } catch (Exception e) {
@@ -74,8 +77,8 @@ public class MovieController {
 
     @Operation(summary = "Get movie data")
     @GetMapping("/{uuid}")
-    public ResponseEntity<MovieDTO> getMovie(@PathVariable UUID uuid) {
-        MovieDTO movieDto;
+    public ResponseEntity<MovieDto> getMovie(@PathVariable UUID uuid) {
+        MovieDto movieDto;
         try {
             movieDto = this.movieService.findByUuid(uuid);
         } catch (Exception e) {
@@ -85,10 +88,22 @@ public class MovieController {
         return ResponseEntity.ok(movieDto);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+            @ApiResponse(responseCode = "400", description = "Bad Request - check the search parameters")
+    })
+    @Parameter(name = "beginDate", description = "Release date after", example = "1968-12-25")
+    @Parameter(name = "endDate",description = "Release date before", example = "1968-12-25")
+    @Parameter(name = "pageable",description = "Sort options", example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 30,\n" +
+            "  \"sort\": [\n" +
+            "    \"rank\"\n" +
+            "  ]\n" +
+            "}")
     @Operation(summary = "Search for movies by release date")
     @GetMapping("/searchByDate")
-    public ResponseEntity<Page<MovieDTO>> searchByDate (
-            @Parameter(description = "Release date after", example = "1968-12-25")
+    public ResponseEntity<Page<MovieDto>> searchByDate (
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @PageableDefault(sort = {"rank", "title"}, direction = Sort.Direction.ASC, size = 10) Pageable pageable
@@ -100,12 +115,24 @@ public class MovieController {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(this.movieService.findMoviesByLaunchDate(beginDate, endDate, pageable));
+        return ResponseEntity.ok(this.movieService.findMoviesByReleaseDate(beginDate, endDate, pageable));
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+            @ApiResponse(responseCode = "400", description = "Bad Request - check the search parameters")
+    })
+    @Parameter(name = "title", description = "Movie title")
+    @Parameter(name = "pageable",description = "Sort options", example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 30,\n" +
+            "  \"sort\": [\n" +
+            "    \"rank\"\n" +
+            "  ]\n" +
+            "}")
     @Operation(summary = "Search for movies by movie title")
     @GetMapping("/searchByTitle")
-    public ResponseEntity<Page<MovieDTO>> searchByTitle (
+    public ResponseEntity<Page<MovieDto>> searchByTitle (
             @RequestParam String title,
             @PageableDefault(sort = {"title"}, direction = Sort.Direction.ASC, size = 20) Pageable pageable
     ) {
