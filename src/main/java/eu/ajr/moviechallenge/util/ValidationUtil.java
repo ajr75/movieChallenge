@@ -15,12 +15,8 @@ public class ValidationUtil {
      */
     public Boolean validateModelField(Class modelClass, String testField) {
 
-        Field[] fieldlist = modelClass.getDeclaredFields();
+        Field[] fieldList = modelClass.getDeclaredFields();
 
-        if(Arrays.stream(fieldlist).anyMatch(aField -> aField.getName().equals(testField))) {
-            return true;
-        }
-
-        return false;
+        return Arrays.stream(fieldList).anyMatch(aField -> aField.getName().equals(testField));
     }
 }

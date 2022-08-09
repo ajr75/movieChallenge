@@ -1,6 +1,6 @@
 package eu.ajr.moviechallenge.service;
 
-import eu.ajr.moviechallenge.dto.MovieDTO;
+import eu.ajr.moviechallenge.dto.MovieDto;
 import eu.ajr.moviechallenge.entity.Movie;
 import eu.ajr.moviechallenge.mapper.MovieMapper;
 import eu.ajr.moviechallenge.repository.MovieRepository;
@@ -23,12 +23,12 @@ public class MovieService {
     @Autowired
     private MovieMapper movieMapper;
 
-    public MovieDTO save(MovieDTO movie) {
+    public MovieDto save(MovieDto movie) {
         Movie createdMovie = this.movieRepository.save(this.movieMapper.toEntity(movie));
         return this.movieMapper.toDto(createdMovie);
     }
 
-    public MovieDTO update(UUID uuid, MovieDTO movieDto) throws Exception {
+    public MovieDto update(UUID uuid, MovieDto movieDto) throws Exception {
         Movie movieBd = this.movieRepository.findByUuid(uuid)
                 .orElseThrow(() -> new Exception(ERROR_MOVIE_NOT_FOUND));
         Movie movieToUpdate = this.movieMapper.toEntity(movieDto);
@@ -43,18 +43,16 @@ public class MovieService {
         this.movieRepository.delete(movie);
     }
 
-    public MovieDTO findByUuid(UUID uuid) throws Exception {
+    public MovieDto findByUuid(UUID uuid) throws Exception {
         return this.movieMapper.toDto(
                 this.movieRepository.findByUuid(uuid)
                         .orElseThrow(() -> new Exception(ERROR_MOVIE_NOT_FOUND))
         );
     }
 
-    public Page<MovieDTO> findMoviesByLaunchDate(LocalDate beginDate, LocalDate endDate, Pageable pageable) {
+    public Page<MovieDto> findMoviesByReleaseDate(LocalDate beginDate, LocalDate endDate, Pageable pageable) {
 
-        throw new IllegalArgumentException("teste de excepção");
-
-/*        Page<Movie> pageMoviesBd;
+        Page<Movie> pageMoviesBd;
         if (beginDate != null && endDate != null) {
             pageMoviesBd =  this.movieRepository.findByReleaseDateBetween(beginDate, endDate, pageable);
             return pageMoviesBd.map(movie -> movieMapper.toDto(movie));
@@ -72,10 +70,10 @@ public class MovieService {
         }
 
         pageMoviesBd = this.movieRepository.findAll(pageable);
-        return pageMoviesBd.map(movie -> movieMapper.toDto(movie));*/
+        return pageMoviesBd.map(movie -> movieMapper.toDto(movie));
     }
 
-    public Page<MovieDTO>  findByMovieTitle(String titleSearch, Pageable pageable) {
+    public Page<MovieDto>  findByMovieTitle(String titleSearch, Pageable pageable) {
         Page<Movie> pageMoviesBd = this.movieRepository.findByTitleContainingIgnoreCase(titleSearch, pageable);
         return pageMoviesBd.map(movie -> movieMapper.toDto(movie));
     }

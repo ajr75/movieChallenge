@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>eu.ajr</groupId>
-	<artifactId>movie-challenge</artifactId>
+	<artifactId>movieChallenge</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>movie-challenge</name>
 	<description>Xpand It MovieChallenge</description>
@@ -62,13 +62,24 @@
             <version>1.5.2.Final</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.6.9</version>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.9.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
